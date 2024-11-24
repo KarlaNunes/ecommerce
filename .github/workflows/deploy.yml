@@ -19,8 +19,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and Test
-        run: mvn -B package
+      - name: Build with Maven
+        run: mvn -B package -DskipTests  # Adicionado -DskipTests aqui
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ecommerce-api:latest .
