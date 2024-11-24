@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class EcommerceApplication {
 
-    @Autowired //testando
+    @Autowired
     private CategoriaRepository categoriaRepository;
 
     public static void main(String[] args) {
