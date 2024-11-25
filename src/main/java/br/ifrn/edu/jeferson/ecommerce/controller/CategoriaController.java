@@ -14,7 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/api/categorias")
-@Tag(name = "Categorias", description = "API de gerenciamento de categorias")
+@Tag(name = "Categorias", description = "API de gerenciamento de categorias dos Produtos")
 public class CategoriaController {
     @Autowired
     private CategoriaService categoriaService;
