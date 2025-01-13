@@ -1,16 +1,22 @@
 package br.ifrn.edu.jeferson.ecommerce.controller;
 
+import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
+import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
+import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.http2.HpackDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/categorias")
@@ -18,11 +24,19 @@ import java.util.List;
 public class CategoriaController {
     @Autowired
     private CategoriaService categoriaService;
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @Operation(summary = "Criar uma nova categoria")
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> salvar(@RequestBody CategoriaRequestDTO categoriaDto) {
-        return ResponseEntity.ok(categoriaService.salvar(categoriaDto));
+        Optional<Categoria> categoria = categoriaRepository.findByNome(categoriaDto.getNome());
+
+        if (categoria.isPresent()) {
+            throw new BusinessException("Nome deve ser único");
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.salvar(categoriaDto));
     }
 
     @Operation(summary = "Listar uma nova categoria")
@@ -31,11 +45,17 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.lista());
     }
 
+    @Operation(summary = "Listar categoria por id")
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoriaResponseDTO> listarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(categoriaService.buscarPorId(id));
+    }
+
     @Operation(summary = "Deletar uma nova categoria")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         categoriaService.deletar(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Atualizar uma nova categoria")
