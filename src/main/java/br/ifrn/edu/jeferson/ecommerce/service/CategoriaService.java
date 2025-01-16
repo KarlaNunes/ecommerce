@@ -1,12 +1,15 @@
 package br.ifrn.edu.jeferson.ecommerce.service;
 
 import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
+import br.ifrn.edu.jeferson.ecommerce.domain.Produto;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
+import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.CategoriaMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,8 @@ public class CategoriaService {
     private CategoriaMapper mapper;
     @Autowired
     private CategoriaMapper categoriaMapper;
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
     public CategoriaResponseDTO salvar(CategoriaRequestDTO categoriaDto) {
         var categoria =  mapper.toEntity(categoriaDto);
@@ -64,4 +69,17 @@ public class CategoriaService {
         return categoriaMapper.toResponseDTO(categoria);
     }
 
+    public CategoriaResponseDTO associarProduto(Long produtoId, Long categoriaId) {
+        Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(
+                () -> new ResourceNotFoundException("Categoria de id " + categoriaId + " não encontrada")
+        );
+
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(
+                () -> new ResourceNotFoundException("Produto com id " + produtoId + " não encontrado")
+        );
+
+        produto.getCategorias().add(categoria);
+
+        return categoriaMapper.toResponseDTO(categoriaRepository.save(categoria));
+    }
 }

@@ -3,6 +3,7 @@ package br.ifrn.edu.jeferson.ecommerce.controller;
 import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
+import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.service.CategoriaService;
@@ -64,4 +65,9 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.atualizar(id, categoriaDto));
     }
 
+    @Operation(summary = "Associar produto à categoria")
+    @PatchMapping("/{categoriaId}/produtos/")
+    public ResponseEntity<CategoriaResponseDTO> associarProduto(@PathVariable Long categoriaId, @RequestBody ProdutoPatchDTO produto) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoriaService.associarProduto(produto.getId(), categoriaId));
+    }
 }
