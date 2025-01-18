@@ -113,13 +113,21 @@ public class CategoriaService {
                 () -> new ResourceNotFoundException("Categoria de id " + categoriaId + " não encontrada")
         );
 
-        if (produto.getCategorias().contains(categoria)) {
-            produto.getCategorias().remove(categoria);
-            produtoRepository.save(produto);
-        } else {
-            throw new BusinessException("Categoria com id " + categoriaId + " não está associada ao produto com id " + produtoId);
-        }
+        ProdutoCategoriaId id = new ProdutoCategoriaId(produtoId, categoriaId);
 
-        return categoriaMapper.toResponseDTO(categoriaRepository.save(categoria));
+        if (!produtoCategoriaRepository.existsById(id)) {
+            throw new BusinessException("Produto de id " + produtoId + " não está associado à categoria de id " + categoriaId);
+        } else {
+            produtoCategoriaRepository.deleteById(id);
+            List<ProdutoCategoria> produtoCategorias = produtoCategoriaRepository.findByCategoriaId(categoriaId);
+            List<ProdutoResponseDTO> produtoResponseDTOS = categoriaMapper.mapProdutoCategoriaToProdutoResponseDTOList(produtoCategorias);
+
+            return new CategoriaResponseDTO(
+                    categoria.getId(),
+                    categoria.getNome(),
+                    categoria.getDescricao(),
+                    produtoResponseDTOS
+            );
+        }
     }
 }
