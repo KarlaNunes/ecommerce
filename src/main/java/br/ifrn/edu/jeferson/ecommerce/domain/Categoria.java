@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@Table(name = "categoria")
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +21,7 @@ public class Categoria {
     private String nome;
     private String descricao;
 
-    @ManyToMany(mappedBy = "categorias")
-    private List<Produto> produtos = new ArrayList<>();
+    @OneToMany(mappedBy = "categoria")
+    private List<ProdutoCategoria> produtos = new ArrayList<>();
 
 }

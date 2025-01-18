@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@Table(name = "produto")
 public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +23,7 @@ public class Produto {
     private BigDecimal preco;
     private Integer estoque;
 
-    @ManyToMany
-    @JoinTable(name = "produto_categoria",
-            joinColumns = @JoinColumn(name = "produto_id"),
-            inverseJoinColumns = @JoinColumn(name = "categoria_id"))
-    private List<Categoria> categorias = new ArrayList<>();
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProdutoCategoria> categorias = new ArrayList<>();
 
 }
