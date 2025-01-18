@@ -2,13 +2,17 @@ package br.ifrn.edu.jeferson.ecommerce.service;
 
 import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
 import br.ifrn.edu.jeferson.ecommerce.domain.Produto;
+import br.ifrn.edu.jeferson.ecommerce.domain.ProdutoCategoria;
+import br.ifrn.edu.jeferson.ecommerce.domain.ProdutoCategoriaId;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
+import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.CategoriaMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,8 @@ public class CategoriaService {
     private CategoriaMapper categoriaMapper;
     @Autowired
     private ProdutoRepository produtoRepository;
+    @Autowired
+    private ProdutoCategoriaRepository produtoCategoriaRepository;
 
     public CategoriaResponseDTO salvar(CategoriaRequestDTO categoriaDto) {
         var categoria =  mapper.toEntity(categoriaDto);
@@ -78,7 +84,41 @@ public class CategoriaService {
                 () -> new ResourceNotFoundException("Produto com id " + produtoId + " não encontrado")
         );
 
-        produto.getCategorias().add(categoria);
+        ProdutoCategoriaId id = new ProdutoCategoriaId(produtoId, categoriaId);
+
+        if (produtoCategoriaRepository.existsById(id)) {
+            throw new BusinessException("Association already exists");
+        } else {
+            ProdutoCategoria produtoCategoria = new ProdutoCategoria(id, produto, categoria);
+            produtoCategoriaRepository.save(produtoCategoria);
+
+            List<ProdutoCategoria> produtoCategorias = produtoCategoriaRepository.findByCategoriaId(categoriaId);
+            List<ProdutoResponseDTO> produtoResponseDTOS = categoriaMapper.mapProdutoCategoriaToProdutoResponseDTOList(produtoCategorias);
+
+            return new CategoriaResponseDTO(
+                    categoria.getId(),
+                    categoria.getNome(),
+                    categoria.getDescricao(),
+                    produtoResponseDTOS
+            );
+        }
+    }
+
+    public CategoriaResponseDTO removerProduto(Long produtoId, Long categoriaId) {
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(
+                () -> new ResourceNotFoundException("Produto com id " + produtoId + " não encontrado")
+        );
+
+        Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(
+                () -> new ResourceNotFoundException("Categoria de id " + categoriaId + " não encontrada")
+        );
+
+        if (produto.getCategorias().contains(categoria)) {
+            produto.getCategorias().remove(categoria);
+            produtoRepository.save(produto);
+        } else {
+            throw new BusinessException("Categoria com id " + categoriaId + " não está associada ao produto com id " + produtoId);
+        }
 
         return categoriaMapper.toResponseDTO(categoriaRepository.save(categoria));
     }
