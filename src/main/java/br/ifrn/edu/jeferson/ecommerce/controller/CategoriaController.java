@@ -72,7 +72,7 @@ public class CategoriaController {
     }
 
     @Operation(summary = "Remover produto de categoria")
-    @PatchMapping("/{categoriaId}/produtos/{produtoId}")
+    @DeleteMapping("/{categoriaId}/produtos/{produtoId}")
     public ResponseEntity<CategoriaResponseDTO> removerProdutoDeCategoria(@PathVariable Long categoriaId, @PathVariable Long produtoId) {
         return ResponseEntity.status(HttpStatus.OK).body(categoriaService.removerProduto(produtoId, categoriaId));
     }
