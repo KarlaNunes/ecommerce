@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "produto_categoria")
 public class ProdutoCategoria {
 
     @EmbeddedId
