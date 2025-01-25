@@ -66,9 +66,9 @@ public class CategoriaController {
     }
 
     @Operation(summary = "Associar produto à categoria")
-    @PatchMapping("/{categoriaId}/produtos/")
-    public ResponseEntity<CategoriaResponseDTO> associarProduto(@PathVariable Long categoriaId, @RequestBody ProdutoPatchDTO produto) {
-        return ResponseEntity.status(HttpStatus.OK).body(categoriaService.associarProduto(produto.getProdutoId(), categoriaId));
+    @PostMapping("/{categoriaId}/produtos/{produtoId}")
+    public ResponseEntity<CategoriaResponseDTO> associarProduto(@PathVariable Long categoriaId, @PathVariable Long produtoId) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoriaService.associarProduto(produtoId, categoriaId));
     }
 
     @Operation(summary = "Remover produto de categoria")
