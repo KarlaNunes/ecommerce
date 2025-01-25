@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class ProdutoPatchDTO {
-    private Long produtoId;
+    private Integer estoque;
 }
