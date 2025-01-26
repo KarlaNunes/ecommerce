@@ -22,7 +22,7 @@ public class Cliente {
     private String cpf;
     private String telefone;
 
-    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "cliente", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Endereco endereco;
 
     @OneToMany(mappedBy = "cliente")

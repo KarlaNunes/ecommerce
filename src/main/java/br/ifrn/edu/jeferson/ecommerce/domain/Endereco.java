@@ -20,7 +20,7 @@ public class Endereco {
     private String cidade;
     private String estado;
     private String cep;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 }
