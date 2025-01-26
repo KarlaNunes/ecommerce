@@ -15,6 +15,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@Table(name = "pedido")
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
