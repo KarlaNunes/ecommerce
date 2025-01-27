@@ -1,15 +1,19 @@
 package br.ifrn.edu.jeferson.ecommerce.service;
 
 import br.ifrn.edu.jeferson.ecommerce.domain.Cliente;
+import br.ifrn.edu.jeferson.ecommerce.domain.ItemPedido;
 import br.ifrn.edu.jeferson.ecommerce.domain.Pedido;
+import br.ifrn.edu.jeferson.ecommerce.domain.Produto;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.enums.StatusPedido;
+import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +30,8 @@ public class PedidoService {
     private PedidoMapper pedidoMapper;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
     public PedidoResponseDTO salvar(PedidoRequestDTO pedidoRequestDTO) {
         Pedido pedido = pedidoMapper.toEntity(pedidoRequestDTO);
@@ -37,10 +43,23 @@ public class PedidoService {
 
         pedido.setCliente(cliente);
 
-        BigDecimal total = pedidoRequestDTO.getItens().stream()
-                .map(itemPedido -> itemPedido.getValorUnitario()
-                        .multiply(BigDecimal.valueOf(itemPedido.getQuantidade())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (ItemPedido itemPedido : pedido.getItens()) {
+            Produto produto = produtoRepository.findById(itemPedido.getProduto().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format("Produto com id %d não encontrado", itemPedido.getProduto().getId())));
+            int quantidade = itemPedido.getQuantidade();
+
+            if (quantidade > produto.getEstoque()) {
+                throw new BusinessException("Não há produto em estoque suficiente");
+            }
+
+            produto.setEstoque(produto.getEstoque() - quantidade);
+            itemPedido.setProduto(produto);
+            BigDecimal valorItem = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
+            total = total.add(valorItem);
+            produtoRepository.save(produto);
+        }
         pedido.setValorTotal(total);
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
     }
