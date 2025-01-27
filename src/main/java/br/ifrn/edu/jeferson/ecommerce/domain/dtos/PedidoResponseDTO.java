@@ -1,8 +1,4 @@
 package br.ifrn.edu.jeferson.ecommerce.domain.dtos;
-
-import br.ifrn.edu.jeferson.ecommerce.domain.Cliente;
-import br.ifrn.edu.jeferson.ecommerce.domain.ItemPedido;
-import br.ifrn.edu.jeferson.ecommerce.domain.enums.StatusPedido;
 import lombok.Data;
 
 import java.math.BigDecimal;

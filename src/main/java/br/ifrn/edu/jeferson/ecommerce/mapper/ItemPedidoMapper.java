@@ -13,6 +13,7 @@ public interface ItemPedidoMapper {
     @Mapping(target = "produto.id", source = "produtoId")
     ItemPedido toEntity(ItemPedidoRequestDTO itemPedidoRequestDTO);
 
+    @Mapping(target = "produtoId", source = "produto.id")
     ItemPedidoResponseDTO toItemPedidoResponseDTO(ItemPedido itemPedido);
 
     @Mapping(target = "id", ignore = true)

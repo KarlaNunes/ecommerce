@@ -1,16 +1,25 @@
 package br.ifrn.edu.jeferson.ecommerce.service;
 
+import br.ifrn.edu.jeferson.ecommerce.domain.Cliente;
+import br.ifrn.edu.jeferson.ecommerce.domain.ItemPedido;
 import br.ifrn.edu.jeferson.ecommerce.domain.Pedido;
+import br.ifrn.edu.jeferson.ecommerce.domain.Produto;
+import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ItemPedidoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.enums.StatusPedido;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
+import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,9 +29,26 @@ public class PedidoService {
     private PedidoRepository pedidoRepository;
     @Autowired
     private PedidoMapper pedidoMapper;
+    @Autowired
+    private ProdutoRepository produtoRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     public PedidoResponseDTO salvar(PedidoRequestDTO pedidoRequestDTO) {
         Pedido pedido = pedidoMapper.toEntity(pedidoRequestDTO);
+        pedido.setDataPedido(LocalDateTime.now());
+        pedido.setStatusPedido(StatusPedido.AGUARDANDO);
+
+        Cliente cliente = clienteRepository.findById(pedidoRequestDTO.getClienteId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Cliente de id %d não encontrado", pedidoRequestDTO.getClienteId())));
+
+        pedido.setCliente(cliente);
+
+        BigDecimal total = pedidoRequestDTO.getItens().stream()
+                .map(itemPedido -> itemPedido.getValorUnitario()
+                        .multiply(BigDecimal.valueOf(itemPedido.getQuantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        pedido.setValorTotal(total);
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
