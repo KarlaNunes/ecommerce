@@ -57,6 +57,7 @@ public class PedidoService {
             produto.setEstoque(produto.getEstoque() - quantidade);
             itemPedido.setProduto(produto);
             BigDecimal valorItem = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
+            itemPedido.setValorUnitario(produto.getPreco());
             total = total.add(valorItem);
             produtoRepository.save(produto);
         }
