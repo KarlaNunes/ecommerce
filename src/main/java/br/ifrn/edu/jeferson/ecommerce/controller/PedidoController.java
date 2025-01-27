@@ -32,6 +32,11 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPorId(id));
     }
 
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<PedidoResponseDTO>> buscarPedidoPorCliente(@PathVariable("clienteId") Long clienteId) {
+        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPorCliente(clienteId));
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<PedidoResponseDTO> editarPedido(@PathVariable Long id,@RequestBody PedidoPatchDTO pedidoPatchDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.atualizarStatus(id,pedidoPatchDTO));

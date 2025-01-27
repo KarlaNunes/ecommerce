@@ -60,12 +60,27 @@ public class PedidoService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Pedido com id %d não encontrado.", id))));
     }
 
+    public List<PedidoResponseDTO> buscarPorCliente(Long clienteId) {
+        clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Cliente com id %d não encontrado", clienteId)));
+
+        return pedidoRepository.findByClienteId(clienteId)
+                .stream()
+                .map(pedidoMapper::toPedidoResponseDTO)
+                .toList();
+    }
+
     public PedidoResponseDTO atualizarStatus(Long id, PedidoPatchDTO pedidoPatchDTO) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Pedido com id %d não encontrado.", id)));
 
-        StatusPedido statusPedido = StatusPedido.valueOf(pedidoPatchDTO.getStatusPedido());
-        pedido.setStatusPedido(statusPedido);
+        try {
+            StatusPedido statusPedido = StatusPedido.valueOf(pedidoPatchDTO.getStatusPedido());
+            pedido.setStatusPedido(statusPedido);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Status do pedido inválido.");
+        }
+
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
