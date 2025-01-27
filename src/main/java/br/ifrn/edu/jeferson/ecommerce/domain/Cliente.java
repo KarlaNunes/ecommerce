@@ -1,6 +1,8 @@
 package br.ifrn.edu.jeferson.ecommerce.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +20,10 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+    @Email
+    @Column(unique = true)
     private String email;
+    @Pattern(regexp = "^(\\\\d{3})\\\\.(\\\\d{3})\\\\.(\\\\d{3})-(\\\\d{2})$", message = "CPF inválido")
     private String cpf;
     private String telefone;
 

@@ -5,6 +5,7 @@ import br.ifrn.edu.jeferson.ecommerce.domain.Endereco;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ClienteRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ClienteResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.EnderecoRequestDTO;
+import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.ClienteMapper;
 import br.ifrn.edu.jeferson.ecommerce.mapper.EnderecoMapper;
@@ -30,6 +31,13 @@ public class ClienteService {
         Endereco endereco = enderecoMapper.toEntity(clienteRequestDTO.getEndereco());
         endereco.setCliente(cliente);
         cliente.setEndereco(endereco);
+        if (clienteRepository.findByEmail(cliente.getEmail()).isPresent()) {
+            throw new BusinessException(String.format("Já existe um cliente cadastrado com esse e-mail: %s", cliente.getEmail()));
+        }
+
+        if (clienteRepository.findByCpf(cliente.getCpf()).isPresent()) {
+            throw new BusinessException(String.format("Já existe um cliente com esse cpf: %s", cliente.getCpf()));
+        }
         return clienteMapper.toClienteResponseDTO(clienteRepository.save(cliente));
     }
 
@@ -58,8 +66,10 @@ public class ClienteService {
     }
 
     public void removerCliente(Long clienteId) {
-        if (!clienteRepository.existsById(clienteId)) {
-            throw new ResourceNotFoundException(String.format(String.format("Cliente com id %d não encontrado" , clienteId)));
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(String.format("Cliente com id %d não encontrado" , clienteId))));
+        if (!cliente.getPedidos().isEmpty()) {
+            throw new IllegalStateException("Não é possível deletar o cliente, pois ele possui pedidos associados.");
         }
         clienteRepository.deleteById(clienteId);
     }
