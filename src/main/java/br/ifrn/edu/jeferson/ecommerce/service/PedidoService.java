@@ -10,7 +10,6 @@ import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
-import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +24,6 @@ public class PedidoService {
     private PedidoRepository pedidoRepository;
     @Autowired
     private PedidoMapper pedidoMapper;
-    @Autowired
-    private ProdutoRepository produtoRepository;
     @Autowired
     private ClienteRepository clienteRepository;
 
