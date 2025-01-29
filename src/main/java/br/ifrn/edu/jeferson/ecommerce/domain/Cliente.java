@@ -20,10 +20,10 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @Email
+    @Email(message = "E-mail inválido")
     @Column(unique = true)
     private String email;
-    @Pattern(regexp = "^(\\\\d{3})\\\\.(\\\\d{3})\\\\.(\\\\d{3})-(\\\\d{2})$", message = "CPF inválido")
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$", message = "CPF inválido")
     private String cpf;
     private String telefone;
 
