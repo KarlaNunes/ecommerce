@@ -4,6 +4,7 @@ import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.service.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     @PostMapping
-    public ResponseEntity<PedidoResponseDTO> salvarPedido(@RequestBody PedidoRequestDTO pedidoRequestDTO) {
+    public ResponseEntity<PedidoResponseDTO> salvarPedido(@RequestBody @Valid PedidoRequestDTO pedidoRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.salvar(pedidoRequestDTO));
     }
 
