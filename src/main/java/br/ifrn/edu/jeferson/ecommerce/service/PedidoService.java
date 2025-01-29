@@ -96,6 +96,9 @@ public class PedidoService {
 
         try {
             StatusPedido statusPedido = StatusPedido.valueOf(pedidoPatchDTO.getStatusPedido());
+            if (statusPedido == StatusPedido.PAGO) {
+                atualizarEstoque(pedido);
+            }
             pedido.setStatusPedido(statusPedido);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Status do pedido inválido.");
@@ -110,5 +113,19 @@ public class PedidoService {
         }
 
         pedidoRepository.deleteById(id);
+    }
+
+    public void atualizarEstoque(Pedido pedido) {
+        for (ItemPedido itemPedido: pedido.getItens()) {
+            int quantidade = itemPedido.getQuantidade();
+            Produto produto = itemPedido.getProduto();
+
+            if (quantidade > produto.getEstoque()) {
+                throw new BusinessException(String.format("Não há %s em estoque suficiente", produto.getNome()));
+            }
+
+            produto.setEstoque(produto.getEstoque() - quantidade);
+            produtoRepository.save(produto);
+        }
     }
 }
