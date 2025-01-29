@@ -3,6 +3,7 @@ import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> cadastrarProduto(@RequestBody ProdutoRequestDTO produtoRequestDTO) {
+    public ResponseEntity<ProdutoResponseDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO produtoRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produtoRequestDTO));
     }
 
