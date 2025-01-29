@@ -12,6 +12,7 @@ import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.ItemPedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class PedidoService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ProdutoRepository produtoRepository;
+    @Autowired
+    private ItemPedidoRepository itemPedidoRepository;
 
     public PedidoResponseDTO salvar(PedidoRequestDTO pedidoRequestDTO) {
         Pedido pedido = pedidoMapper.toEntity(pedidoRequestDTO);
@@ -51,15 +54,15 @@ public class PedidoService {
             int quantidade = itemPedido.getQuantidade();
 
             if (quantidade > produto.getEstoque()) {
-                throw new BusinessException("Não há produto em estoque suficiente");
+                throw new BusinessException(String.format("Não há %s em estoque suficiente", produto.getNome()));
             }
 
-            produto.setEstoque(produto.getEstoque() - quantidade);
             itemPedido.setProduto(produto);
             BigDecimal valorItem = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
             itemPedido.setValorUnitario(produto.getPreco());
             total = total.add(valorItem);
-            produtoRepository.save(produto);
+            itemPedido.setPedido(pedido);
+            itemPedidoRepository.save(itemPedido);
         }
         pedido.setValorTotal(total);
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
