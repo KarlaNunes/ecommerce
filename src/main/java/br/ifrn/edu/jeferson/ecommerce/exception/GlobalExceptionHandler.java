@@ -15,6 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler {
         public ErrorResponse(String message) {
             this.timestamp = LocalDateTime.now();
             this.message = message;
+            this.errors = Collections.emptyMap();
         }
     }
 
