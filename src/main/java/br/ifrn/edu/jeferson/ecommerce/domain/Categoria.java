@@ -18,6 +18,7 @@ public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String nome;
     private String descricao;
 
