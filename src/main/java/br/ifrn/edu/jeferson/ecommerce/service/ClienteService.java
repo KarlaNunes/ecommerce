@@ -58,6 +58,14 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Cliente com id %d não encontrado" , clienteId)));
 
+        if (!cliente.getEmail().equals(clienteRequestDTO.getEmail()) && clienteRepository.findByEmail(cliente.getEmail()).isPresent()) {
+            throw new BusinessException(String.format("Já existe um cliente com esse e-mail: %s", cliente.getEmail()));
+        }
+
+        if (clienteRepository.findByCpf(cliente.getCpf()).isPresent() && !cliente.getCpf().equals(clienteRequestDTO.getCpf())) {
+            throw new BusinessException(String.format("Já existe um cliente com esse cpf: %s", cliente.getCpf()));
+        }
+
         Endereco endereco = enderecoMapper.toEntity(clienteRequestDTO.getEndereco());
         endereco.setCliente(cliente);
         cliente.setEndereco(endereco);
