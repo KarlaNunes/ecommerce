@@ -3,10 +3,16 @@ import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.service.ProdutoService;
+import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +33,30 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produtoRequestDTO));
     }
 
-    @Operation(summary = "Listar produtos")
+    @Operation(
+            summary = "Listar produtos",
+            parameters = {
+                    @Parameter(
+                            name = "page",
+                            description = "Número da página",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "0")
+                    ),
+                    @Parameter(
+                            name = "size",
+                            description = "Número de intens por página",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "20")
+                    )
+            }
+    )
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos() {
-        return ResponseEntity.status(HttpStatus.OK).body(produtoService.listar());
+    public ResponseEntity<CustomPage<ProdutoResponseDTO>> listarProdutos(
+           @Parameter(hidden = true) Pageable pageable
+    ) {
+        Page<ProdutoResponseDTO> response = produtoService.listar(pageable);
+        var customPageResponse = new CustomPage<>(response);
+        return ResponseEntity.status(HttpStatus.OK).body(customPageResponse);
     }
 
     @Operation(summary = "Buscar produto pelo id")

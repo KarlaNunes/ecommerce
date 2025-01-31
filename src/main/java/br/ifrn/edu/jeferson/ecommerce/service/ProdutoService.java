@@ -10,6 +10,8 @@ import br.ifrn.edu.jeferson.ecommerce.mapper.ProdutoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,11 +39,9 @@ public class ProdutoService {
         return produtoMapper.toProdutoResponseDTO(produto);
     }
 
-    public List<ProdutoResponseDTO> listar() {
-        return produtoRepository.findAll()
-                .stream()
-                .map(produtoMapper::toProdutoResponseDTO)
-                .toList();
+    public Page<ProdutoResponseDTO> listar(Pageable pageable) {
+        return produtoRepository.findAll(pageable)
+                .map(produtoMapper::toProdutoResponseDTO);
     }
 
     public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO produtoRequestDTO) {
