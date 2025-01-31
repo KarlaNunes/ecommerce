@@ -8,9 +8,17 @@ import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.service.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.http2.HpackDecoder;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -40,10 +48,28 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.salvar(categoriaDto));
     }
 
-    @Operation(summary = "Listar uma nova categoria")
+    @Operation(
+            summary = "Listar categorias",
+            parameters = {
+                    @Parameter(
+                            name = "page",
+                            description = "Número da página",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "0")
+                    ),
+                    @Parameter(
+                            name = "size",
+                            description = "Número de itens por página",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "20")
+                    )
+            }
+    )
     @GetMapping
-    public ResponseEntity<List<CategoriaResponseDTO>> listar() {
-        return ResponseEntity.ok(categoriaService.lista());
+    public ResponseEntity<Page<CategoriaResponseDTO>> listar(
+           @Parameter(hidden = true) Pageable pageable
+    ) {
+        return ResponseEntity.ok(categoriaService.lista(pageable));
     }
 
     @Operation(summary = "Listar categoria por id")

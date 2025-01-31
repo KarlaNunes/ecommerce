@@ -15,6 +15,8 @@ import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,9 +47,8 @@ public class CategoriaService {
         return mapper.toResponseDTO(categoria);
     }
 
-    public List<CategoriaResponseDTO> lista(){
-        List<Categoria> categorias = categoriaRepository.findAll();
-        return mapper.toDTOList (categorias);
+    public Page<CategoriaResponseDTO> lista(Pageable pageable) {
+        return categoriaRepository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     public void deletar(Long id) {
