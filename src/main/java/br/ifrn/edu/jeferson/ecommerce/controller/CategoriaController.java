@@ -7,6 +7,7 @@ import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.service.CategoriaService;
+import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -66,10 +67,12 @@ public class CategoriaController {
             }
     )
     @GetMapping
-    public ResponseEntity<Page<CategoriaResponseDTO>> listar(
+    public ResponseEntity<CustomPage<CategoriaResponseDTO>> listar(
            @Parameter(hidden = true) Pageable pageable
     ) {
-        return ResponseEntity.ok(categoriaService.lista(pageable));
+        Page<CategoriaResponseDTO> response = categoriaService.lista(pageable);
+        var customPageResponse = new CustomPage<>(response);
+        return ResponseEntity.ok(customPageResponse);
     }
 
     @Operation(summary = "Listar categoria por id")
