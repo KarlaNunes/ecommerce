@@ -11,6 +11,8 @@ import br.ifrn.edu.jeferson.ecommerce.mapper.ClienteMapper;
 import br.ifrn.edu.jeferson.ecommerce.mapper.EnderecoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +43,9 @@ public class ClienteService {
         return clienteMapper.toClienteResponseDTO(clienteRepository.save(cliente));
     }
 
-    public List<ClienteResponseDTO> listarClientes() {
-        return clienteRepository.findAll()
-                .stream()
-                .map(clienteMapper::toClienteResponseDTO)
-                .toList();
+    public Page<ClienteResponseDTO> listarClientes(Pageable pageable) {
+        return clienteRepository.findAll(pageable)
+                .map(clienteMapper::toClienteResponseDTO);
     }
 
     public ClienteResponseDTO buscarClientePorId(Long clienteId) {
