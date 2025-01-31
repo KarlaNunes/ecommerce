@@ -16,6 +16,8 @@ import br.ifrn.edu.jeferson.ecommerce.repository.ItemPedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -68,11 +70,9 @@ public class PedidoService {
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
-    public List<PedidoResponseDTO> listar() {
-        return pedidoRepository.findAll()
-                .stream()
-                .map(pedidoMapper::toPedidoResponseDTO)
-                .collect(Collectors.toList());
+    public Page<PedidoResponseDTO> listar(Pageable pageable) {
+        return pedidoRepository.findAll(pageable)
+                .map(pedidoMapper::toPedidoResponseDTO);
     }
 
     public PedidoResponseDTO buscarPorId(Long id) {
