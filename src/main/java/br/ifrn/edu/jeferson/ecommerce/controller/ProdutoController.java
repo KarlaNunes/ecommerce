@@ -2,6 +2,7 @@ package br.ifrn.edu.jeferson.ecommerce.controller;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoResponseDTO;
+import br.ifrn.edu.jeferson.ecommerce.queryFilters.ProdutoQueryFilter;
 import br.ifrn.edu.jeferson.ecommerce.service.ProdutoService;
 import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,9 +53,10 @@ public class ProdutoController {
     )
     @GetMapping
     public ResponseEntity<CustomPage<ProdutoResponseDTO>> listarProdutos(
-           @Parameter(hidden = true) Pageable pageable
+           @Parameter(hidden = true) Pageable pageable,
+           ProdutoQueryFilter filter
     ) {
-        Page<ProdutoResponseDTO> response = produtoService.listar(pageable);
+        Page<ProdutoResponseDTO> response = produtoService.listar(pageable, filter.buildSpecification());
         var customPageResponse = new CustomPage<>(response);
         return ResponseEntity.status(HttpStatus.OK).body(customPageResponse);
     }
