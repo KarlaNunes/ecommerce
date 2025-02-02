@@ -3,6 +3,7 @@ package br.ifrn.edu.jeferson.ecommerce.controller;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.PedidoResponseDTO;
+import br.ifrn.edu.jeferson.ecommerce.queryFilters.PedidoQueryFilter;
 import br.ifrn.edu.jeferson.ecommerce.service.PedidoService;
 import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,9 +54,10 @@ public class PedidoController {
     )
     @GetMapping
     public ResponseEntity<CustomPage<PedidoResponseDTO>> listarPedidos(
-           @Parameter(hidden = true) Pageable pageable
+           @Parameter(hidden = true) Pageable pageable,
+           PedidoQueryFilter filter
     ) {
-        Page<PedidoResponseDTO> response = pedidoService.listar(pageable);
+        Page<PedidoResponseDTO> response = pedidoService.listar(pageable, filter.buildSpecification());
         var customPageResponse = new CustomPage<>(response);
         return ResponseEntity.status(HttpStatus.OK).body(customPageResponse);
     }
