@@ -6,7 +6,6 @@ import br.ifrn.edu.jeferson.ecommerce.domain.ProdutoCategoria;
 import br.ifrn.edu.jeferson.ecommerce.domain.ProdutoCategoriaId;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
-import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.exception.ResourceNotFoundException;
@@ -14,12 +13,13 @@ import br.ifrn.edu.jeferson.ecommerce.mapper.CategoriaMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
+import br.ifrn.edu.jeferson.ecommerce.specifications.CategoriaSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,8 +47,8 @@ public class CategoriaService {
         return mapper.toResponseDTO(categoria);
     }
 
-    public Page<CategoriaResponseDTO> lista(Pageable pageable) {
-        return categoriaRepository.findAll(pageable).map(mapper::toResponseDTO);
+    public Page<CategoriaResponseDTO> lista(Pageable pageable, Specification<Categoria> categoriaSpec) {
+        return categoriaRepository.findAll(categoriaSpec, pageable).map(mapper::toResponseDTO);
     }
 
     public void deletar(Long id) {

@@ -5,8 +5,10 @@ import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.ProdutoPatchDTO;
 import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
+import br.ifrn.edu.jeferson.ecommerce.queryFilters.CategoriaQueryFilter;
 import br.ifrn.edu.jeferson.ecommerce.repository.CategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.service.CategoriaService;
+import br.ifrn.edu.jeferson.ecommerce.specifications.CategoriaSpec;
 import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -68,9 +70,10 @@ public class CategoriaController {
     )
     @GetMapping
     public ResponseEntity<CustomPage<CategoriaResponseDTO>> listar(
-           @Parameter(hidden = true) Pageable pageable
+           @Parameter(hidden = true) Pageable pageable,
+           CategoriaQueryFilter filter
     ) {
-        Page<CategoriaResponseDTO> response = categoriaService.lista(pageable);
+        Page<CategoriaResponseDTO> response = categoriaService.lista(pageable, filter.toSpecification());
         var customPageResponse = new CustomPage<>(response);
         return ResponseEntity.ok(customPageResponse);
     }
