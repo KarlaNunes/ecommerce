@@ -1,5 +1,6 @@
 package br.ifrn.edu.jeferson.ecommerce.controller;
 
+import br.ifrn.edu.jeferson.ecommerce.controller.swagger.CategoriaControllerInterface;
 import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.domain.dtos.CategoriaResponseDTO;
@@ -32,14 +33,12 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/categorias")
-@Tag(name = "Categorias", description = "API de gerenciamento de categorias dos Produtos")
-public class CategoriaController {
+public class CategoriaController implements CategoriaControllerInterface {
     @Autowired
     private CategoriaService categoriaService;
     @Autowired
     private CategoriaRepository categoriaRepository;
 
-    @Operation(summary = "Criar uma nova categoria")
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> salvar(@RequestBody CategoriaRequestDTO categoriaDto) {
         Optional<Categoria> categoria = categoriaRepository.findByNome(categoriaDto.getNome());
@@ -51,26 +50,10 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.salvar(categoriaDto));
     }
 
-    @Operation(
-            summary = "Listar categorias",
-            parameters = {
-                    @Parameter(
-                            name = "page",
-                            description = "Número da página",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size",
-                            description = "Número de itens por página",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    )
-            }
-    )
+
     @GetMapping
     public ResponseEntity<CustomPage<CategoriaResponseDTO>> listar(
-           @Parameter(hidden = true) Pageable pageable,
+           Pageable pageable,
            CategoriaQueryFilter filter
     ) {
         Page<CategoriaResponseDTO> response = categoriaService.lista(pageable, filter.toSpecification());
@@ -78,32 +61,27 @@ public class CategoriaController {
         return ResponseEntity.ok(customPageResponse);
     }
 
-    @Operation(summary = "Listar categoria por id")
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> listarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaService.buscarPorId(id));
     }
 
-    @Operation(summary = "Deletar uma nova categoria")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         categoriaService.deletar(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Operation(summary = "Atualizar uma nova categoria")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO categoriaDto) {
         return ResponseEntity.ok(categoriaService.atualizar(id, categoriaDto));
     }
 
-    @Operation(summary = "Associar produto à categoria")
     @PostMapping("/{categoriaId}/produtos/{produtoId}")
     public ResponseEntity<CategoriaResponseDTO> associarProduto(@PathVariable Long categoriaId, @PathVariable Long produtoId) {
         return ResponseEntity.status(HttpStatus.OK).body(categoriaService.associarProduto(produtoId, categoriaId));
     }
 
-    @Operation(summary = "Remover produto de categoria")
     @DeleteMapping("/{categoriaId}/produtos/{produtoId}")
     public ResponseEntity<CategoriaResponseDTO> removerProdutoDeCategoria(@PathVariable Long categoriaId, @PathVariable Long produtoId) {
         return ResponseEntity.status(HttpStatus.OK).body(categoriaService.removerProduto(produtoId, categoriaId));
