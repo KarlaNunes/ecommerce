@@ -7,12 +7,7 @@ import br.ifrn.edu.jeferson.ecommerce.queryFilters.PedidoQueryFilter;
 import br.ifrn.edu.jeferson.ecommerce.service.PedidoService;
 import br.ifrn.edu.jeferson.ecommerce.utils.CustomPage;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.catalina.util.CustomObjectInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,37 +19,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pedidos")
-@Tag(name = "Pedidos", description = "API de gerenciamento de pedidos")
 public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    @Operation(summary = "Criar um novo pedido")
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> salvarPedido(@RequestBody @Valid PedidoRequestDTO pedidoRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.salvar(pedidoRequestDTO));
     }
 
-    @Operation(
-            summary = "Listar pedidos",
-            parameters = {
-                    @Parameter(
-                            name = "page",
-                            description = "Número da página",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size",
-                            description = "Número de itens por página",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    )
-            }
-    )
     @GetMapping
     public ResponseEntity<CustomPage<PedidoResponseDTO>> listarPedidos(
-           @Parameter(hidden = true) Pageable pageable,
+           Pageable pageable,
            PedidoQueryFilter filter
     ) {
         Page<PedidoResponseDTO> response = pedidoService.listar(pageable, filter.buildSpecification());
@@ -62,19 +38,16 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.OK).body(customPageResponse);
     }
 
-    @Operation(summary = "Buscar pedido por id")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> buscarPedidoPorId(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPorId(id));
     }
 
-    @Operation(summary = "Buscar pedidos de um cliente")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<PedidoResponseDTO>> buscarPedidoPorCliente(@PathVariable("clienteId") Long clienteId) {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.buscarPorCliente(clienteId));
     }
 
-    @Operation(summary = "Editar pedido")
     @PatchMapping("/{id}/status")
     public ResponseEntity<PedidoResponseDTO> editarPedido(@PathVariable Long id,@RequestBody PedidoPatchDTO pedidoPatchDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(pedidoService.atualizarStatus(id,pedidoPatchDTO));
