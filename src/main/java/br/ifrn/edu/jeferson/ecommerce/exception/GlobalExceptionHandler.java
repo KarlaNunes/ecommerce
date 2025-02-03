@@ -3,6 +3,7 @@ package br.ifrn.edu.jeferson.ecommerce.exception;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@Log4j2
 public class GlobalExceptionHandler {
 
     // Primeiro, definimos a classe ErrorResponse
@@ -48,12 +50,16 @@ public class GlobalExceptionHandler {
             NoResourceFoundException ex,
             WebRequest request) {
 
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
                 .message("Recurso não encontrado: " + ex.getResourcePath())
-                .path(((ServletWebRequest) request).getRequest().getRequestURI())
+                .path((path))
                 .build();
+
+        log.error("NoResourceFoundException - Path: {}, Message: {}", path, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -72,6 +78,9 @@ public class GlobalExceptionHandler {
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
 
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("BusinessException - Path: {}, Message: {}", path, ex.getMessage());
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -89,6 +98,9 @@ public class GlobalExceptionHandler {
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
 
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("ResourceNotFoundException - Path: {}, Message: {}", path, ex.getMessage());
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
@@ -104,6 +116,9 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
+
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("IllegalArgumentException - Path: {}, Message: {}", path, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -121,6 +136,9 @@ public class GlobalExceptionHandler {
                 .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .build();
 
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("IllegalStateException - Path: {}, Message: {}", path, ex.getMessage());
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -131,10 +149,14 @@ public class GlobalExceptionHandler {
             WebRequest request
     ) {
 
+        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("Validation error - Path: {}", path);
+
         Map<String, String> errors = new HashMap<>();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
+            log.error("Validation field error - Field: {}, Message: {}", error.getField(), error.getDefaultMessage());
         }
 
         ErrorResponse error = ErrorResponse.builder()
