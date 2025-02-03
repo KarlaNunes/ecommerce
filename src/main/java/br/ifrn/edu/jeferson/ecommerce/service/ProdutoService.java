@@ -10,6 +10,7 @@ import br.ifrn.edu.jeferson.ecommerce.mapper.ProdutoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,6 +41,10 @@ public class ProdutoService {
         return produtoMapper.toProdutoResponseDTO(produto);
     }
 
+    @Cacheable(
+            value = "produtos",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
+    )
     public Page<ProdutoResponseDTO> listar(Pageable pageable, Specification<Produto> specification) {
         return produtoRepository.findAll(specification, pageable)
                 .map(produtoMapper::toProdutoResponseDTO);

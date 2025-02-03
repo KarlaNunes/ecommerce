@@ -16,6 +16,7 @@ import br.ifrn.edu.jeferson.ecommerce.repository.ItemPedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -71,6 +72,10 @@ public class PedidoService {
         return pedidoMapper.toPedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
+    @Cacheable(
+            value = "pedidos",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
+    )
     public Page<PedidoResponseDTO> listar(Pageable pageable, Specification<Pedido> specification) {
         return pedidoRepository.findAll(specification, pageable)
                 .map(pedidoMapper::toPedidoResponseDTO);

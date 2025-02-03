@@ -15,6 +15,7 @@ import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoCategoriaRepository;
 import br.ifrn.edu.jeferson.ecommerce.repository.ProdutoRepository;
 import br.ifrn.edu.jeferson.ecommerce.specifications.CategoriaSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,6 +48,10 @@ public class CategoriaService {
         return mapper.toResponseDTO(categoria);
     }
 
+    @Cacheable(
+            value = "categorias",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
+    )
     public Page<CategoriaResponseDTO> lista(Pageable pageable, Specification<Categoria> categoriaSpec) {
         return categoriaRepository.findAll(categoriaSpec, pageable).map(mapper::toResponseDTO);
     }
